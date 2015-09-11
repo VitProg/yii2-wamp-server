@@ -1,0 +1,48 @@
+{
+  "name": "viktor/yii2-wamp-server",
+  "description": "",
+  "type": "yii2-extension",
+  "keywords": [
+    "yii",
+    "wamp",
+    "server",
+    "yii2",
+    "yii 2"
+  ],
+  "homepage": "https://github.com/vitprog/yii2-wamp-server",
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "VitProg",
+      "email": "vitrog@gmail.com",
+      "homepage": "https://github.com/viprog",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/vitprog/yii2-wamp-server/issues?state=open",
+    "source": "https://github.com/vitprog/yii2-wamp-server"
+  },
+  "require": {
+    "php": ">=5.4.0",
+    "yiisoft/yii2": "*",
+    "voryx/thruway":"0.3.*",
+    "bower-asset/autobahn" : "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "vitprog\\wamp\\": ""
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    },
+    "asset-installer-paths": {
+      "bower-asset-library": "vendor/bower"
+    }
+  }
+}
