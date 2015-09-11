@@ -1,6 +1,6 @@
 {
-  "name": "viktor/yii2-wamp-server",
-  "description": "",
+  "name": "vitprog/yii2-wamp-server",
+  "description": "Yii2 WAMP server",
   "type": "yii2-extension",
   "keywords": [
     "yii",
