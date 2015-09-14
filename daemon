@@ -1,0 +1,9 @@
+#!/usr/bin/env php
+<?php
+
+require_once(__DIR__ . '/vendor/autoload.php');
+require_once(__DIR__ . '/vendor/yiisoft/yii2/Yii.php');
+require_once 'Daemon.php';
+
+$daemon = new \vitprog\wamp\Daemon(require 'demo-config.php');
+$daemon->run();

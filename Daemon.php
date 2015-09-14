@@ -22,9 +22,7 @@ class Daemon {
     public $authMng;
     public $auth;
 
-    function __construct($configPath) {
-
-        $config = require($configPath);
+    function __construct(array $config) {
 
         $authOptions = ArrayHelper::getValue($config, 'server.auth', []);
         $providerOptions = ArrayHelper::getValue($config, 'server.provider', []);
@@ -70,6 +68,7 @@ class Daemon {
     }
 
     public function run() {
+        echo 'Yii2 WAMP server run' . PHP_EOL;
         $this->router->start();
     }
 }

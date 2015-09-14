@@ -1,7 +1,7 @@
 {
   "name": "vitprog/yii2-wamp-server",
-  "description": "Yii2 WAMP server",
-  "type": "yii2-extension",
+  "description": "",
+  "type": "yii2-extension", 
   "keywords": [
     "yii",
     "wamp",
@@ -27,7 +27,8 @@
     "php": ">=5.4.0",
     "yiisoft/yii2": "*",
     "voryx/thruway":"0.3.*",
-    "bower-asset/autobahn" : "*"
+    "bower-asset/autobahn" : "*",
+    "bower-asset/cryptojslib" : "*"
   },
   "require-dev": {
     "phpunit/phpunit": "4.*"
