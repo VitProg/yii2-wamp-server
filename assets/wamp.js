@@ -1,5 +1,5 @@
 
-wamp = (function($){
+wamp = new (function($){
 
     var self = this;
 
@@ -56,7 +56,4 @@ wamp = (function($){
             events.push(callback);
         }
     };
-
-
-    return this;
 })(jQuery);
