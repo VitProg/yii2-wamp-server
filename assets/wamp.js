@@ -44,6 +44,8 @@ wamp = (function($){
             events = [];
             connected = true;
         };
+
+        self.connect.open();
     };
 
     var events = [];
@@ -55,7 +57,6 @@ wamp = (function($){
         }
     };
 
-    this.connect.open();
 
     return this;
 })(jQuery);
