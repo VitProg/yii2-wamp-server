@@ -29,21 +29,21 @@ wamp = (function($){
                 return hashInBase64;
             }
         });
-    };
 
-    this.connect.onopen = function (session) {
-        self.session = session;
-        if (connected) {
-            return;
-        }
-        for (var i in events) {
-            if (events.hasOwnProperty(i) == false) {
-                continue;
+        self.connect.onopen = function (session) {
+            self.session = session;
+            if (connected) {
+                return;
             }
-            events[i].call(self, session);
-        }
-        events = [];
-        connected = true;
+            for (var i in events) {
+                if (events.hasOwnProperty(i) == false) {
+                    continue;
+                }
+                events[i].call(self, session);
+            }
+            events = [];
+            connected = true;
+        };
     };
 
     var events = [];
