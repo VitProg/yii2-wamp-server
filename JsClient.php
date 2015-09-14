@@ -15,8 +15,9 @@ use yii\helpers\Json;
 class JsClient {
 
     public static function InitJs($jsSettings = []) {
-        Asset::register(\Yii::$app->getView());
+        AutobahnAsset::register(\Yii::$app->getView());
         CryptoAsset::register(\Yii::$app->getView());
+        Asset::register(\Yii::$app->getView());
 
         $jsSettings = ArrayHelper::merge([], $jsSettings);
 
