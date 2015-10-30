@@ -15,6 +15,8 @@ wamp = new (function($){
 
     this.connect = null;
 
+    var token = null;
+
     this.init = function(_settings) {
         settings = $.extend(true, {}, settings, _settings);
 
@@ -25,8 +27,7 @@ wamp = new (function($){
             authid: settings.uid,
             onchallenge : function(self, method, extra){
                 var hash = CryptoJS.HmacSHA256(extra.challenge, settings.token);
-                var hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
-                return hashInBase64;
+                return CryptoJS.enc.Base64.stringify(hash);
             }
         });
 

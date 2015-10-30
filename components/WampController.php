@@ -159,4 +159,49 @@ abstract class WampController extends Component {
     public function init() {
     }
 
+    public function __call($name, $params)
+    {
+        if (strpos($name, '_call_') === 0) {
+
+            $methodName = substr($name, strlen('_call_'));
+
+            list ($args, $argsKw, $details) = $params;
+
+            /** @var InternalClient $internal */
+            $internal = Yii::$app->wampInternal;
+
+            if (is_object($argsKw)) {
+                $argsKw = (array)$argsKw;
+            };
+
+            if (empty($argsKw) || empty($argsKw['sessionId'])) {
+                // todo disconnect session
+                var_dump('!!!!!!!!!!!!!!!!!!!!!!!!');
+                return false;
+            }
+
+            $sessionId = (int)$argsKw['sessionId'];
+            $sessionData = $internal->getSessionInList($sessionId);
+
+            if ($sessionData == null) {
+                // todo disconect client
+                return null;
+            }
+
+            unset($args['sessionId']);
+
+            if ($this->hasMethod($methodName)) {
+                return call_user_func_array([$this, $methodName], [$sessionData, $args, $argsKw, $details]);
+            }
+        }
+
+        $this->ensureBehaviors();
+        foreach ($this->_behaviors as $object) {
+            if ($object->hasMethod($name)) {
+                return call_user_func_array([$object, $name], $params);
+            }
+        }
+        throw new UnknownMethodException('Calling unknown method: ' . get_class($this) . "::$name()");
+    }
+
 }

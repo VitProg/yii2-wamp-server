@@ -33,6 +33,7 @@ class InternalClient extends Client {
 
     public $realm = 'realm1';
     public $controllers = [];
+    public $sessionDuration = 86400; // 1 day
 
     /**
      * List sessions info
@@ -78,7 +79,7 @@ class InternalClient extends Client {
                             continue;
                         }
                         $procedureName = $controller->getUri($callUri);
-                        $callback = [$controller, $callOptions[0]];
+                        $callback = [$controller, '_call_' . $callOptions[0]];
                         unset($callOptions[0]);
                         $options = empty($callOptions) ? $callOptions : [];
 //                        $this->getCallee()->register(
@@ -99,7 +100,7 @@ class InternalClient extends Client {
                             continue;
                         }
                         $topicName = $controller->getUri($subscribeUri);
-                        $callback = [$controller, $subscribeOptions[0]];
+                        $callback = [$controller, '_call_' . $subscribeOptions[0]];
                         unset($subscribeOptions[0]);
                         $options = empty($subscribeOptions) ? $subscribeOptions : [];
 //                        $this->getSubscriber()->subscribe(
@@ -126,30 +127,79 @@ class InternalClient extends Client {
 
     public function onSessionJoin($args, $kwArgs, $options) {
 
-        /** @var Cache $cache */
-//        $cache = \Yii::$app->wampCache;
-//        $cache->set()
+        $roleCheck = isset($args[0]->authroles) && in_array('authenticated_user', $args[0]->authroles);
+        $userId = (int)$args[0]->authid;
+        $sessionId = (int)$args[0]->session;
 
-        var_dump($args);
-        var_dump($kwArgs);
-        var_dump($options);
+        if (!$roleCheck || !$userId || !$sessionId) {
+            var_dump('---------------------------------');
+            return;
+        }
 
-//        $args = json_decode(json_encode($args), true);
-//        echo "Session {$args[0]['session']} joinned\n";
-//        $this->_sessions[] = $args[0];
+        $this->addSessionToList($sessionId, $userId);
+
+        echo "Session {$sessionId} joinned\n";
     }
 
     public function onSessionLeave($args, $kwArgs, $options) {
-//        $args = json_decode(json_encode($args), true);
-//        if (!empty($args[0]['session'])) {
-//            foreach ($this->_sessions as $key => $details) {
-//                if ($args[0]['session'] == $details['session']) {
-//                    echo "Session {$details['session']} leaved\n";
-//                    unset($this->_sessions[$key]);
-//                    return;
-//                }
-//            }
-//        }
+        $sessionId = (int)$args[0]->session;
+        $this->removeSessionFromList($sessionId);
+
+        echo "Session {$sessionId} leaved\n";
+    }
+
+
+    /// clients sessions
+
+    public function getSessionList() {
+        /** @var Cache $cache */
+        $cache = \Yii::$app->wampCache;
+        $sessions = $cache->get('wamp_sessions');
+        if (!$sessions) {
+            $sessions = [];
+            $cache->set('wamp_sessions', $sessions, 0);
+        }
+        return $sessions;
+    }
+
+    public function setSessionList($sessions) {
+        /** @var Cache $cache */
+        $cache = \Yii::$app->wampCache;
+        $cache->set('wamp_sessions', $sessions, 0);
+    }
+
+    public function addSessionToList($sessionId, $user) {
+        /** @var Cache $cache */
+        $cache = \Yii::$app->wampCache;
+
+        $time = time();
+
+        $sessionData = [
+            'session' => $sessionId,
+            'user' => $user,
+            'time' => $time,
+        ];
+        $cache->set('wamp_session_' . $sessionId, $sessionData, $this->sessionDuration);
+        $sessions = $this->getSessionList();
+        $sessions[$sessionId] = $time;
+        $this->setSessionList($sessions);
+    }
+
+    public function getSessionInList($sessionId) {
+        /** @var Cache $cache */
+        $cache = \Yii::$app->wampCache;
+        $sessionDate = $cache->get('wamp_session_' . (int)$sessionId);
+        return $sessionDate ? $sessionDate : null;
+    }
+
+    public function removeSessionFromList($sessionId) {
+        /** @var Cache $cache */
+        $cache = \Yii::$app->wampCache;
+        $cache->delete('wamp_session_' . (int)$sessionId);
+
+        $sessions = $this->getSessionList();
+        unset($sessions[$sessionId]);
+        $this->setSessionList($sessions);
     }
 
 }
