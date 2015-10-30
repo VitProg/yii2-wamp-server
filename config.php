@@ -9,7 +9,7 @@
 return [
     'server' => [
         'provider' => [
-            'address' => 'jquarter.ru',
+            'address' => 'localhost',
             'port' => 8008,
         ],
         'auth' => [],
@@ -19,7 +19,7 @@ return [
         ],
     ],
     'yii' => [
-        'id' => 'wamp demo',
+        'id' => 'wamp server',
         'basePath' => __DIR__,
         'components' => [
             'errorHandler' => [

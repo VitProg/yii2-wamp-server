@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+
+file_put_contents('config-local.php', <<<PHP
+<?php
+return [];
+PHP
+);
