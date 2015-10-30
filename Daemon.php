@@ -41,7 +41,7 @@ class Daemon {
         if ($authClass != null) {
             $this->authMng = new \Thruway\Authentication\AuthenticationManager();
             $this->router->setAuthenticationManager($this->authMng);
-//            $this->router->addInternalClient($this->authMng);
+            $this->router->addInternalClient($this->authMng);
 
             $this->auth = new $authClass(ArrayHelper::getValue($authOptions, 'realms', ["*"]));
             $this->router->addInternalClient($this->auth);

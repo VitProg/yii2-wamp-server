@@ -48,6 +48,30 @@ wamp = new (function($){
         self.connect.open();
     };
 
+    this.subscribe = function(topic, handler, options) {
+        return self.connect.session.subscribe(topic, handler, options);
+    };
+
+    this.unsubscribe = function(subscription) {
+        return self.connect.session.unsubscribe(subscription);
+    };
+
+    this.publish = function(topic, args, kwargs, options) {
+        return self.connect.session.publish(topic, args, kwargs, options);
+    };
+
+    this.register = function(procedure, endpoint, options) {
+        return self.connect.session.register(procedure, endpoint, options);
+    };
+
+    this.unregister = function (registration) {
+        return self.connect.session.unregister(registration);
+    };
+
+    this.call = function(procedure, args, kwargs, options) {
+        return self.connect.session.call(procedure, args, kwargs, options);
+    };
+
     var events = [];
     this.onopen = function(callback) {
         if (connected) {

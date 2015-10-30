@@ -9,8 +9,8 @@
 return [
     'server' => [
         'provider' => [
-            'address' => 'localhost',
-            'port' => 8080,
+            'address' => 'jquarter.ru',
+            'port' => 8008,
         ],
         'auth' => [],
         'internal' => [
