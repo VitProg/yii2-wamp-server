@@ -30,18 +30,11 @@ wamp = new (function($){
             }
         });
 
-        self.connect.onopen = function (session) {
+        self.connect.onopen = function (session, details) {
             self.session = session;
             if (connected) {
                 return;
             }
-            for (var i in events) {
-                if (events.hasOwnProperty(i) == false) {
-                    continue;
-                }
-                events[i].call(self, session);
-            }
-            events = [];
             connected = true;
         };
 
@@ -82,14 +75,5 @@ wamp = new (function($){
             kwargs.sessionId = self.session.id;
         }
         return self.connect.session.call(procedure, args, kwargs, options);
-    };
-
-    var events = [];
-    this.onopen = function(callback) {
-        if (connected) {
-            callback.call(self, self.session);
-        } else {
-            events.push(callback);
-        }
     };
 })(jQuery);

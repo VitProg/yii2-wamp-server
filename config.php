@@ -26,5 +26,8 @@ return [
                 'class' => 'yii\console\ErrorHandler',
             ],
         ],
+        'wampCache' => [
+            'class' => 'yii\caching\FileCache'
+        ]
     ],
 ];

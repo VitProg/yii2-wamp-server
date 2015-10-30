@@ -11,6 +11,7 @@ namespace vitprog\wamp\server;
 
 use vitprog\wamp\components\WampController;
 use Thruway\Peer\Client;
+use yii\caching\Cache;
 use yii\helpers\Console;
 use yii\helpers\VarDumper;
 
@@ -124,6 +125,15 @@ class InternalClient extends Client {
     }
 
     public function onSessionJoin($args, $kwArgs, $options) {
+
+        /** @var Cache $cache */
+//        $cache = \Yii::$app->wampCache;
+//        $cache->set()
+
+        var_dump($args);
+        var_dump($kwArgs);
+        var_dump($options);
+
 //        $args = json_decode(json_encode($args), true);
 //        echo "Session {$args[0]['session']} joinned\n";
 //        $this->_sessions[] = $args[0];

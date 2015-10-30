@@ -12,6 +12,7 @@ namespace vitprog\wamp\server;
 use yii\base\Application;
 use yii\base\Request;
 use yii\base\Response;
+use yii\caching\Cache;
 
 /**
  * Class WampApplication
@@ -19,6 +20,7 @@ use yii\base\Response;
  *
  * @property \Thruway\Peer\Router $wampRouter
  * @property InternalClient $wampInternal
+ * @property Cache $wampCache
  *
  */
 class YiiWampApplication extends Application {
