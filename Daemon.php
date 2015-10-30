@@ -45,6 +45,22 @@ class Daemon {
         $realm = ArrayHelper::getValue($config, 'server.realm', 'realm1');
 
 
+        $basePath = ArrayHelper::getValue($config, 'yii.basePath', null);
+        if ($basePath == null) {
+            die('yii.basePath not set');
+        }
+        if (ArrayHelper::getValue($config, 'yii.vendorPath', null) == null) {
+            $config['yii']['vendorPath'] = realpath($basePath . '/vendor');
+        }
+        if (ArrayHelper::getValue($config, 'yii.runtimePath', null) == null) {
+            $config['yii']['runtimePath'] = realpath($basePath . '/runtime');
+        }
+
+        $app = new $yiiAppClass($config['yii']);
+
+        $this->cache = \Yii::createObject($cacheClass, $cacheConfig);
+
+
         $this->router = new Router();
 
         if ($authClass != null) {
@@ -66,12 +82,8 @@ class Daemon {
         \Yii::configure($this->internal, $internalOptions);
         $this->router->addInternalClient($this->internal);
 
-        if ($cacheClass) {
-            unset($cacheConfig['class']);
-            $this->cache = \Yii::createObject($cacheClass, $cacheConfig);
-        }
 
-        new $yiiAppClass($config['yii']);
+
         \Yii::$app->setComponents(
             [
                 'wampDeamon' => $this,
