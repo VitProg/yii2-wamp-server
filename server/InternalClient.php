@@ -127,25 +127,35 @@ class InternalClient extends Client {
 
     public function onSessionJoin($args, $kwArgs, $options) {
 
-        $roleCheck = isset($args[0]->authroles) && in_array('authenticated_user', $args[0]->authroles);
-        $userId = (int)$args[0]->authid;
-        $sessionId = (int)$args[0]->session;
+        try {
+            $roleCheck = isset($args[0]->authroles) && in_array('authenticated_user', $args[0]->authroles);
+            $userId = (int)$args[0]->authid;
+            $sessionId = (int)$args[0]->session;
 
-        if (!$roleCheck || !$userId || !$sessionId) {
-            var_dump('---------------------------------');
-            return;
+            if (!$roleCheck || !$userId || !$sessionId) {
+                var_dump('---------------------------------');
+                return;
+            }
+
+            $this->addSessionToList($sessionId, $userId);
+
+            echo "Session {$sessionId} joinned\n";
+
+        } catch (\Exception $e) {
+            echo Console::renderColoredString('%rError: %w' . (string)$e . '%n') . PHP_EOL;
         }
-
-        $this->addSessionToList($sessionId, $userId);
-
-        echo "Session {$sessionId} joinned\n";
     }
 
     public function onSessionLeave($args, $kwArgs, $options) {
-        $sessionId = (int)$args[0]->session;
-        $this->removeSessionFromList($sessionId);
+        try {
+            $sessionId = (int)$args[0]->session;
+            $this->removeSessionFromList($sessionId);
 
-        echo "Session {$sessionId} leaved\n";
+            echo "Session {$sessionId} leaved\n";
+
+        } catch (\Exception $e) {
+            echo Console::renderColoredString('%rError: %w' . (string)$e . '%n') . PHP_EOL;
+        }
     }
 
 
