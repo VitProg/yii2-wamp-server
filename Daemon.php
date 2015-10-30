@@ -80,6 +80,9 @@ class Daemon {
         $this->router->start();
     }
 
+    /**
+     * @return static
+     */
     public static function wamp() {
         return static::$_instance;
     }

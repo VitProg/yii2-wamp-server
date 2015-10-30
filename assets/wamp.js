@@ -57,6 +57,9 @@ wamp = new (function($){
     };
 
     this.publish = function(topic, args, kwargs, options) {
+        if (!options || !options.authid) {
+            options.session = self.session.id;
+        }
         return self.connect.session.publish(topic, args, kwargs, options);
     };
 
@@ -69,6 +72,9 @@ wamp = new (function($){
     };
 
     this.call = function(procedure, args, kwargs, options) {
+        if (!options || !options.authid) {
+            options.session = self.session.id;
+        }
         return self.connect.session.call(procedure, args, kwargs, options);
     };
 
