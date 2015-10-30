@@ -19,6 +19,9 @@ return [
             'realm' => 'realm1',
             'controllers' => [],
         ],
+        'cache' => [
+            'class' => 'yii\caching\FileCache'
+        ]
     ],
     'yii' => [
         'id' => 'wamp server',
@@ -28,8 +31,5 @@ return [
                 'class' => 'yii\console\ErrorHandler',
             ],
         ],
-        'wampCache' => [
-            'class' => 'yii\caching\FileCache'
-        ]
     ],
 ];

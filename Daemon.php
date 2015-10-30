@@ -9,6 +9,7 @@
 namespace vitprog\wamp;
 
 use \Thruway\Peer\Router;
+use yii\caching\FileCache;
 use \yii\helpers\ArrayHelper;
 
 
@@ -33,11 +34,13 @@ class Daemon {
         $authOptions = ArrayHelper::getValue($config, 'server.auth', []);
         $providerOptions = ArrayHelper::getValue($config, 'server.provider', []);
         $internalOptions = ArrayHelper::getValue($config, 'server.internal', []);
+        $cacheConfig = ArrayHelper::getValue($config, 'server.cache', []);
 
         $yiiAppClass = ArrayHelper::getValue($config, 'server.yiiAppClass', 'vitprog\wamp\server\YiiWampApplication');
         $authClass = ArrayHelper::getValue($authOptions, 'class', '\vitprog\wamp\server\AuthProvider');
-        $providerClass = ArrayHelper::getValue($providerOptions, 'server.provider', '\Thruway\Transport\RatchetTransportProvider');
-        $internalClass = ArrayHelper::getValue($internalOptions, 'server.internal', '\vitprog\wamp\server\InternalClient');
+        $providerClass = ArrayHelper::getValue($providerOptions, 'class', '\Thruway\Transport\RatchetTransportProvider');
+        $internalClass = ArrayHelper::getValue($internalOptions, 'class', '\vitprog\wamp\server\InternalClient');
+        $cacheClass = ArrayHelper::getValue($cacheConfig, 'class', '\yii\caching\FileCache');
 
         $realm = ArrayHelper::getValue($config, 'server.realm', 'realm1');
 
@@ -63,12 +66,18 @@ class Daemon {
         \Yii::configure($this->internal, $internalOptions);
         $this->router->addInternalClient($this->internal);
 
+        if ($cacheClass) {
+            unset($cacheConfig['class']);
+            $this->cache = \Yii::createObject($cacheClass, $cacheConfig);
+        }
+
         new $yiiAppClass($config['yii']);
         \Yii::$app->setComponents(
             [
                 'wampDeamon' => $this,
                 'wampRouter' => $this->router,
                 'wampInternal' => $this->internal,
+                'wampCache' => $this->cache,
             ]
         );
 
