@@ -195,7 +195,13 @@ abstract class WampController extends Component {
                 unset($args['sessionId']);
 
                 if ($this->hasMethod($methodName)) {
-                    return call_user_func_array([$this, $methodName], [$sessionData, $args, $argsKw, $details]);
+                    $params = [$sessionData];
+                    if (!empty($argsKw)) {
+                        $params += array_values($argsKw);
+                    }
+                    $params[] = $args;
+                    
+                    return call_user_func_array([$this, $methodName], $params);
                 }
             }
 
