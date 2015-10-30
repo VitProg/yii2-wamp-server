@@ -36,6 +36,13 @@ wamp = new (function($){
             if (connected) {
                 return;
             }
+            for (var i in events.onopen) {
+                if (events.onopen.hasOwnProperty(i) == false) {
+                    continue;
+                }
+                events.onopen[i].call(self, session);
+            }
+            events.onopen = [];
             connected = true;
         };
 
@@ -77,4 +84,15 @@ wamp = new (function($){
         }
         return self.connect.session.call(procedure, args, kwargs, options);
     };
+
+
+    var events = {'onopen' : []};
+    this.onopen = function(callback) {
+        if (connected) {
+            callback.call(self, self.session);
+        } else {
+            events.onopen.push(callback);
+        }
+    };
+
 })(jQuery);
