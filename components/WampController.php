@@ -14,6 +14,7 @@ use vitprog\wamp\server\InternalClient;
 use yii\base\Component;
 use yii\base\Controller;
 use yii\base\UnknownMethodException;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\helpers\VarDumper;
@@ -202,6 +203,8 @@ abstract class WampController extends Component {
                         $params = array_merge($params, $argsKw);
                     }
                     $params['args'] = $args;
+                    $params['userId'] = (int)$sessionData['user'];
+                    $params['currentUserId'] = (int)$sessionData['user'];
 
                     $method = new \ReflectionMethod($this, $methodName);
 
@@ -216,18 +219,25 @@ abstract class WampController extends Component {
                         if (array_key_exists($name, $params)) {
                             if ($param->isArray()) {
                                 $argsMethod[] = is_array($params[$name]) ? $params[$name] : [$params[$name]];
-                            } elseif (!is_array($params[$name])) {
-                                $argsMethod[] = $params[$name];
                             } else {
-                                throw new BadRequestHttpException(Yii::t('yii', 'Invalid data received for parameter "{param}".', [
-                                    'param' => $name,
-                                ]));
+                                $argsMethod[] = $params[$name];
                             }
                             unset($params[$name]);
                         } elseif ($param->isDefaultValueAvailable()) {
                             $argsMethod[] = $param->getDefaultValue();
                         } else {
-                            $missing[] = $name;
+                            if ($name == 'currentUser' || $name == 'user') {
+                                /** @var ActiveRecord $userClass */
+                                $userClass = \Yii::$app->user->identityClass;
+                                $user = $userClass::findOne($params['userId']);
+                                if ($user == null) {
+                                    $missing[] = $name;
+                                } else {
+                                    $argsMethod[] = $user;
+                                }
+                            } else {
+                                $missing[] = $name;
+                            }
                         }
                     }
 
