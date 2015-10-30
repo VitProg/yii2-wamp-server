@@ -9,8 +9,7 @@
 namespace vitprog\wamp\server;
 
 
-use app\modules\pm\models\Talk;
-use app\server\components\WampController;
+use vitprog\wamp\components\WampController;
 use Thruway\Peer\Client;
 use yii\helpers\Console;
 use yii\helpers\VarDumper;
