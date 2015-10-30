@@ -9,6 +9,8 @@
 namespace vitprog\wamp;
 
 
+use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\AssetBundle;
 
 class Asset extends AssetBundle {
@@ -20,7 +22,25 @@ class Asset extends AssetBundle {
     ];
 
     public $depends = [
-        'yii\web\JqueryAsset'
+        'yii\web\JqueryAsset',
+        'vitprog\wamp\AutobahnAsset',
+        'vitprog\wamp\CryptoAsset',
     ];
+
+    public $jsSettings = [];
+
+    public function publish($am) {
+        parent::publish($am);
+
+        $jsSettings = ArrayHelper::merge([], $this->jsSettings);
+
+        $jsSettings = Json::encode($jsSettings);
+
+        \Yii::$app->getView()->registerJs(<<<JS
+    wamp.init({$jsSettings});
+JS
+        );
+    }
+
 
 }
