@@ -42,7 +42,7 @@ class AuthProvider extends AbstractAuthProviderClient {
 
             //        VarDumper::dump($helloMsg, 3);
 
-            $authid = (int)$helloMsg->getDetails()->authid;
+            $authid = (int)preg_replace('~^user~', '', $helloMsg->getDetails()->authid);
 
             /** @var ActiveRecord $userClass */
             $userClass = \Yii::$app->user->identityClass;

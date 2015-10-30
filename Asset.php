@@ -42,6 +42,10 @@ class Asset extends AssetBundle {
 
         $jsSettings = ArrayHelper::merge([], static::$jsSettings);
 
+        if ($jsSettings['uid']) {
+            $jsSettings['uid'] = 'user' . $jsSettings['uid'];
+        }
+
         $jsSettings = Json::encode($jsSettings);
 
         \Yii::$app->getView()->registerJs(<<<JS
