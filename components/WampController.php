@@ -18,6 +18,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\helpers\VarDumper;
 use yii\log\Logger;
+use yii\web\BadRequestHttpException;
 
 abstract class WampController extends Component {
 
@@ -196,23 +197,23 @@ abstract class WampController extends Component {
                 unset($args['sessionId']);
 
                 if ($this->hasMethod($methodName)) {
-                    $params = [$sessionData];
+                    $params = ['session' => $sessionData];
                     if (!empty($argsKw)/* && ArrayHelper::isAssociative($argsKw)*/) {
                         $params = array_merge($params, $argsKw);
                     }
-                    $params[] = $args;
+                    $params['args'] = $args;
 
                     $method = new \ReflectionMethod($this, $methodName);
 
-                    $args = [];
+                    $argsMethod = [];
                     $missing = [];
                     foreach ($method->getParameters() as $param) {
                         $name = $param->getName();
                         if (array_key_exists($name, $params)) {
                             if ($param->isArray()) {
-                                $args[] = is_array($params[$name]) ? $params[$name] : [$params[$name]];
+                                $argsMethod[] = is_array($params[$name]) ? $params[$name] : [$params[$name]];
                             } elseif (!is_array($params[$name])) {
-                                $args[] = $params[$name];
+                                $argsMethod[] = $params[$name];
                             } else {
                                 throw new BadRequestHttpException(Yii::t('yii', 'Invalid data received for parameter "{param}".', [
                                     'param' => $name,
@@ -220,7 +221,7 @@ abstract class WampController extends Component {
                             }
                             unset($params[$name]);
                         } elseif ($param->isDefaultValueAvailable()) {
-                            $args[] = $param->getDefaultValue();
+                            $argsMethod[] = $param->getDefaultValue();
                         } else {
                             $missing[] = $name;
                         }
@@ -230,7 +231,7 @@ abstract class WampController extends Component {
                         Yii::$app->requestedParams = $params;
                     }
 
-                    return call_user_func_array([$this, $methodName], $args);
+                    return call_user_func_array([$this, $methodName], $argsMethod);
                 }
             }
 
