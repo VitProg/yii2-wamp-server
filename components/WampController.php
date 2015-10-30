@@ -208,7 +208,11 @@ abstract class WampController extends Component {
                     $argsMethod = [];
                     $missing = [];
                     foreach ($method->getParameters() as $param) {
+
                         $name = $param->getName();
+                        $name = str_replace(' ', '', ucwords(implode(' ', explode('-', $name))));
+                        $name = mb_strtolower(substr($name, 0, 1)) . substr($name, 1);
+
                         if (array_key_exists($name, $params)) {
                             if ($param->isArray()) {
                                 $argsMethod[] = is_array($params[$name]) ? $params[$name] : [$params[$name]];
