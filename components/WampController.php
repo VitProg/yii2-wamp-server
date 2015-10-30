@@ -14,6 +14,7 @@ use vitprog\wamp\server\InternalClient;
 use yii\base\Component;
 use yii\base\Controller;
 use yii\base\UnknownMethodException;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\helpers\VarDumper;
 use yii\log\Logger;
@@ -196,12 +197,40 @@ abstract class WampController extends Component {
 
                 if ($this->hasMethod($methodName)) {
                     $params = [$sessionData];
-                    if (!empty($argsKw)) {
-                        $params += array_values($argsKw);
+                    if (!empty($argsKw)/* && ArrayHelper::isAssociative($argsKw)*/) {
+                        $params = array_merge($params, $argsKw);
                     }
                     $params[] = $args;
-                    
-                    return call_user_func_array([$this, $methodName], $params);
+
+                    $method = new \ReflectionMethod($this, $methodName);
+
+                    $args = [];
+                    $missing = [];
+                    foreach ($method->getParameters() as $param) {
+                        $name = $param->getName();
+                        if (array_key_exists($name, $params)) {
+                            if ($param->isArray()) {
+                                $args[] = is_array($params[$name]) ? $params[$name] : [$params[$name]];
+                            } elseif (!is_array($params[$name])) {
+                                $args[] = $params[$name];
+                            } else {
+                                throw new BadRequestHttpException(Yii::t('yii', 'Invalid data received for parameter "{param}".', [
+                                    'param' => $name,
+                                ]));
+                            }
+                            unset($params[$name]);
+                        } elseif ($param->isDefaultValueAvailable()) {
+                            $args[] = $param->getDefaultValue();
+                        } else {
+                            $missing[] = $name;
+                        }
+                    }
+
+                    if (Yii::$app->requestedParams === null) {
+                        Yii::$app->requestedParams = $params;
+                    }
+
+                    return call_user_func_array([$this, $methodName], $args);
                 }
             }
 
