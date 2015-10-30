@@ -22,7 +22,13 @@ class Daemon {
     public $authMng;
     public $auth;
 
+    protected static $_instance;
+
     function __construct(array $config) {
+
+        if (static::$_instance !== null) {
+            throw new \Exception();
+        }
 
         $authOptions = ArrayHelper::getValue($config, 'server.auth', []);
         $providerOptions = ArrayHelper::getValue($config, 'server.provider', []);
@@ -65,10 +71,16 @@ class Daemon {
                 'wampInternal' => $this->internal,
             ]
         );
+
+        static::$_instance = $this;
     }
 
     public function run() {
         echo 'Yii2 WAMP server run' . PHP_EOL;
         $this->router->start();
+    }
+
+    public function wamp() {
+        return static::$_instance;
     }
 }
