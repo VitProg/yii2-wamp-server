@@ -13,8 +13,10 @@ use \Yii;
 use vitprog\wamp\server\InternalClient;
 use yii\base\Component;
 use yii\base\Controller;
+use yii\base\UnknownMethodException;
 use yii\helpers\Console;
 use yii\helpers\VarDumper;
+use yii\log\Logger;
 
 abstract class WampController extends Component {
 
@@ -161,47 +163,53 @@ abstract class WampController extends Component {
 
     public function __call($name, $params)
     {
-        if (strpos($name, '_call_') === 0) {
+        try {
 
-            $methodName = substr($name, strlen('_call_'));
+            if (strpos($name, '_call_') === 0) {
 
-            list ($args, $argsKw, $details) = $params;
+                $methodName = substr($name, strlen('_call_'));
 
-            /** @var InternalClient $internal */
-            $internal = Yii::$app->wampInternal;
+                list ($args, $argsKw, $details) = $params;
 
-            if (is_object($argsKw)) {
-                $argsKw = (array)$argsKw;
-            };
+                /** @var InternalClient $internal */
+                $internal = Yii::$app->wampInternal;
 
-            if (empty($argsKw) || empty($argsKw['sessionId'])) {
-                // todo disconnect session
-                var_dump('!!!!!!!!!!!!!!!!!!!!!!!!');
-                return false;
+                if (is_object($argsKw)) {
+                    $argsKw = (array)$argsKw;
+                };
+
+                if (empty($argsKw) || empty($argsKw['sessionId'])) {
+                    // todo disconnect session
+                    var_dump('!!!!!!!!!!!!!!!!!!!!!!!!');
+                    return false;
+                }
+
+                $sessionId = (int)$argsKw['sessionId'];
+                $sessionData = $internal->getSessionInList($sessionId);
+
+                if ($sessionData == null) {
+                    // todo disconect client
+                    return null;
+                }
+
+                unset($args['sessionId']);
+
+                if ($this->hasMethod($methodName)) {
+                    return call_user_func_array([$this, $methodName], [$sessionData, $args, $argsKw, $details]);
+                }
             }
 
-            $sessionId = (int)$argsKw['sessionId'];
-            $sessionData = $internal->getSessionInList($sessionId);
-
-            if ($sessionData == null) {
-                // todo disconect client
-                return null;
+            $this->ensureBehaviors();
+            foreach ($this->_behaviors as $object) {
+                if ($object->hasMethod($name)) {
+                    return call_user_func_array([$object, $name], $params);
+                }
             }
-
-            unset($args['sessionId']);
-
-            if ($this->hasMethod($methodName)) {
-                return call_user_func_array([$this, $methodName], [$sessionData, $args, $argsKw, $details]);
-            }
+            throw new UnknownMethodException('Calling unknown method: ' . get_class($this) . "::$name()");
+        } catch (\Exception $ex) {
+            \Yii::getLogger()->log($ex, Logger::LEVEL_ERROR, 'wamp-server');
         }
-
-        $this->ensureBehaviors();
-        foreach ($this->_behaviors as $object) {
-            if ($object->hasMethod($name)) {
-                return call_user_func_array([$object, $name], $params);
-            }
-        }
-        throw new UnknownMethodException('Calling unknown method: ' . get_class($this) . "::$name()");
+        return null;
     }
 
 }
