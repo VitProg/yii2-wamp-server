@@ -139,12 +139,12 @@ class InternalClient extends Client {
         $user = $userClass::findOne($uid);
 
         if ($user == null ) {
-            return 'user is null';
+            return ['error' => 'user is null'];
         }
 
         if ($user->wampGetAuthToken() != $authToken) {
-            VarDumper::dump([$user->wampGetAuthToken(), $authToken, $sessionId, $user->toArray()]);
-            return 'authToken';
+//            VarDumper::dump([$user->wampGetAuthToken(), $authToken, $sessionId, $user->toArray()]);
+            return ['error' => 'authToken'];
         }
 
         $token = $user->wampGenerateToken($sessionId);
@@ -154,7 +154,7 @@ class InternalClient extends Client {
             $session->saveSession();
         }
 
-        VarDumper::dump([$kwArgs, $token, $user->toArray()]);
+//        VarDumper::dump([$kwArgs, $token, $user->toArray()]);
 
         return [
             'token' => $token,
