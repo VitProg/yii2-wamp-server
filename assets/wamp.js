@@ -45,6 +45,8 @@ wamp = new (function($){
                     if (result && result.token) {
                         self.log('Auth successfully. Token: '. result.token);
                         token = result.token;
+
+                        //self.trigger('initialized', {'token' : token});
                     } else {
                         self.log('Auth error!');
                         self.ws.disconnect();

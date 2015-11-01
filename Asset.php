@@ -42,7 +42,7 @@ class Asset extends AssetBundle {
         $jsSettings = ArrayHelper::merge([], static::$jsSettings);
 
         if ($jsSettings['uid']) {
-            $jsSettings['uid'] = 'user' . $jsSettings['uid'];
+            $jsSettings['uid'] = (int)$jsSettings['uid'];
         }
 
         $jsSettings = Json::encode($jsSettings);

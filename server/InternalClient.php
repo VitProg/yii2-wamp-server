@@ -11,9 +11,12 @@ namespace vitprog\wamp\server;
 
 use vitprog\wamp\components\WampController;
 use Thruway\Peer\Client;
+use vitprog\wamp\components\WampUserTrait;
 use yii\caching\Cache;
+use yii\db\ActiveRecord;
 use yii\helpers\Console;
 use yii\helpers\VarDumper;
+use yii\web\IdentityInterface;
 
 /**
  * Class InternalClient
@@ -61,6 +64,7 @@ class InternalClient extends Client {
             $session->subscribe('wamp.metaevent.session.on_join',  [$this, 'onSessionJoin']);
             $session->subscribe('wamp.metaevent.session.on_leave', [$this, 'onSessionLeave']);
 
+            // todo регистрировать только после авторизации
             // инициализация методов
             foreach ($this->controllers as $controllerClass) {
 
@@ -125,8 +129,28 @@ class InternalClient extends Client {
     }
 
     public function onAuth($args, $kwArgs, $options) {
-        VarDumper::dump([$args, $kwArgs, $options]);
-        //todo
+        $sessionId = $kwArgs->sessionId;
+        $authToken = $kwArgs->authToken;
+        $uid = (int)$kwArgs->uid;
+
+        /** @var ActiveRecord $userClass */
+        $userClass = \Yii::$app->user->identityClass;
+        /** @var $user ActiveRecord|IdentityInterface|WampUserTrait */
+        $user = $userClass::findOne($uid);
+
+        if ($user == null ) {
+            return 'user is null';
+        }
+
+        if ($user->getAuthKey() != $authToken) {
+            return 'authToken';
+        }
+
+        $token = $user->wampGenerateToken($authToken);
+
+        return [
+            'token' => $token,
+        ];
     }
 
     public function onSessionJoin($args, $kwArgs, $options) {

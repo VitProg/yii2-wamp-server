@@ -9,6 +9,7 @@
 namespace vitprog\wamp\components;
 
 
+use vitprog\wamp\server\Session;
 use \Yii;
 use vitprog\wamp\server\InternalClient;
 use yii\base\Component;
@@ -170,6 +171,7 @@ abstract class WampController extends Component {
 
             if (strpos($name, '_call_') === 0) {
 
+                // добавлять токен
                 $methodName = substr($name, strlen('_call_'));
 
                 list ($args, $argsKw, $details) = $params;
@@ -181,31 +183,31 @@ abstract class WampController extends Component {
                     $argsKw = (array)$argsKw;
                 };
 
-                if (empty($argsKw) || empty($argsKw['sessionId'])) {
+                if (empty($argsKw) || empty($argsKw['token'])) {
                     // todo disconnect session
                     var_dump('!!!!!!!!!!!!!!!!!!!!!!!!');
                     return false;
                 }
 
-                $sessionId = (int)$argsKw['sessionId'];
-                $sessionData = $internal->getSessionInList($sessionId);
+                $token = (int)$argsKw['token'];
+                $session = Session::getSession($token);
 
-                if ($sessionData == null) {
+                if ($session == null) {
                     // todo disconect client
                     return null;
                 }
 
-                unset($args['sessionId']);
+                unset($args['token']);
 
                 if ($this->hasMethod($methodName)) {
-                    $params = ['session' => $sessionData];
+                    $params = ['session' => $session];
                     if (!empty($argsKw)/* && ArrayHelper::isAssociative($argsKw)*/) {
                         $params = array_merge($params, $argsKw);
                     }
                     $params['args'] = $args;
                     // todo $currentUserId - фигня какаято
-                    $params['userId'] = (int)$sessionData['user'];
-                    $params['currentUserId'] = (int)$sessionData['user'];
+                    $params['userId'] = (int)$session->userId;
+                    $params['currentUserId'] = (int)$session->userId;
 
                     $method = new \ReflectionMethod($this, $methodName);
 
@@ -228,9 +230,7 @@ abstract class WampController extends Component {
                             $argsMethod[] = $param->getDefaultValue();
                         } else {
                             if ($name == 'currentUser' || $name == 'user') {
-                                /** @var ActiveRecord $userClass */
-                                $userClass = \Yii::$app->user->identityClass;
-                                $user = $userClass::findOne($params['userId']);
+                                $user = $session->getUser();
                                 if ($user == null) {
                                     $missing[] = $name;
                                 } else {
