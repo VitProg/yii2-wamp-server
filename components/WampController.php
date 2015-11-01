@@ -200,7 +200,7 @@ abstract class WampController extends Component {
                     return ['error' => 'user is null'];
                 }
 
-                if ($user->wampGenerateToken() != $token) {
+                if ($user->wampGenerateToken($session->id) != $token) {
                     return ['error' => 'token!'];
                 }
 

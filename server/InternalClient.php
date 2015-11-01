@@ -147,7 +147,7 @@ class InternalClient extends Client {
             return 'authToken';
         }
 
-        $token = $user->wampGenerateToken($authToken);
+        $token = $user->wampGenerateToken($sessionId);
 
         if ($token) {
             $session = new Session($sessionId, $token, $user->id);

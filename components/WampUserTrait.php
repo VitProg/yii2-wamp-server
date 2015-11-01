@@ -12,8 +12,8 @@ trait WampUserTrait {
         return sha1($this->getAuthKey());
     }
 
-    public function wampGenerateToken($authToken = null) {
-        $token = sha1(md5(($authToken ? $authToken : $this->wampGetAuthToken()) . $this->id . self::$wampSecret));
+    public function wampGenerateToken($sessionId) {
+        $token = sha1(md5($this->wampGetAuthToken() . $this->id . $sessionId . self::$wampSecret));
         return $token;
     }
 
