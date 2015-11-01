@@ -221,7 +221,7 @@ abstract class WampController extends Component {
                             $params[$name] = $value;
                         }
 //                        $params = array_merge($params, $argsuments);
-                        VarDumper::dump($params, 3, 0);
+//                        VarDumper::dump($params, 3, 0);
                     }
                     $params['args'] = $args;
                     $params['userId'] = (int)$session->userId;
