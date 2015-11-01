@@ -215,7 +215,13 @@ abstract class WampController extends Component {
 //                    var_dump('line:'.__LINE__);
                     $params = ['session' => $session];
                     if (!empty($argsuments)) {
-                        $params = array_merge($params, $argsuments);
+                        foreach ($argsuments as $name => $value) {
+                            $name = str_replace(' ', '', ucwords(implode(' ', explode('-', $name))));
+                            $name = mb_strtolower(substr($name, 0, 1)) . substr($name, 1);
+                            $params[$name] = $value;
+                        }
+//                        $params = array_merge($params, $argsuments);
+                        var_dump($params);
                     }
                     $params['args'] = $args;
                     $params['userId'] = (int)$session->userId;
@@ -228,8 +234,6 @@ abstract class WampController extends Component {
                     foreach ($method->getParameters() as $param) {
 //                        var_dump('line:'.__LINE__);
                         $name = $param->getName();
-                        $name = str_replace(' ', '', ucwords(implode(' ', explode('-', $name))));
-                        $name = mb_strtolower(substr($name, 0, 1)) . substr($name, 1);
 
                         if (array_key_exists($name, $params)) {
                             if ($param->isArray()) {
