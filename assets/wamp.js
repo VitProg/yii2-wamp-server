@@ -19,7 +19,7 @@ wamp = new (function($){
 
     var token = null;
 
-    this.log = function() {
+    this.log = function(v) {
         if (settings.debug) {
             console.log(v);
         }
