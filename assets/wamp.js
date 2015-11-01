@@ -45,9 +45,10 @@ wamp = new (function($){
                     if (result && result[0] && result[0].token) {
                         token = result[0].token;
                         self.log('Auth successfully. Token: '. token);
-                        //self.trigger('initialized', {'token' : token});
+                        self.trigger('initialized', {'token' : token});
                     } else {
                         self.log('Auth error!');
+                        self.trigger('error');
                         self.ws.disconnect();
                         delete (self);
                         delete (wamp);
@@ -55,6 +56,7 @@ wamp = new (function($){
                 },
                 onError: function (err) {
                     self.log('RPC auth successfully failed with error ' + err);
+                    self.trigger('error');
                     self.ws.disconnect();
                     delete (self);
                     delete (wamp);
