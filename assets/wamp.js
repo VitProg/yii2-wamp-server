@@ -127,7 +127,7 @@ wamp = new (function($){
                 if (events[event].hasOwnProperty(i) == false) {
                     continue;
                 }
-                events[event].call(self, data);
+                events[event][i].call(self, data);
             }
         }
     }
