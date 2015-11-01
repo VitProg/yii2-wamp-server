@@ -57,7 +57,7 @@ class Session {
 
     /** @return ActiveRecord|IdentityInterface|WampUserTrait */
     public function getUser() {
-        if ($this->user === false) {
+        if (!$this->user) {
             /** @var ActiveRecord $userClass */
             $userClass = \Yii::$app->user->identityClass;
             /** @var $user ActiveRecord|IdentityInterface|WampUserTrait */
