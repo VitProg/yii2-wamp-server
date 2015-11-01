@@ -19,10 +19,6 @@ class Daemon {
     public $internal;
     public $provider;
 
-    /** @var \Thruway\Module\Module|\Thruway\Authentication\AuthenticationManagerInterface **/
-    public $authMng;
-    public $auth;
-
     protected static $_instance;
 
     function __construct(array $config) {
@@ -31,13 +27,11 @@ class Daemon {
             throw new \Exception();
         }
 
-        $authOptions = ArrayHelper::getValue($config, 'server.auth', []);
         $providerOptions = ArrayHelper::getValue($config, 'server.provider', []);
         $internalOptions = ArrayHelper::getValue($config, 'server.internal', []);
         $cacheConfig = ArrayHelper::getValue($config, 'server.cache', []);
 
         $yiiAppClass = ArrayHelper::getValue($config, 'server.yiiAppClass', 'vitprog\wamp\server\YiiWampApplication');
-        $authClass = ArrayHelper::getValue($authOptions, 'class', '\vitprog\wamp\server\AuthProvider');
         $providerClass = ArrayHelper::getValue($providerOptions, 'class', '\Thruway\Transport\RatchetTransportProvider');
         $internalClass = ArrayHelper::getValue($internalOptions, 'class', '\vitprog\wamp\server\InternalClient');
         $cacheClass = ArrayHelper::getValue($cacheConfig, 'class', '\yii\caching\FileCache');
@@ -62,15 +56,6 @@ class Daemon {
 
 
         $this->router = new Router();
-
-        if ($authClass != null) {
-            $this->authMng = new \Thruway\Authentication\AuthenticationManager();
-            $this->router->setAuthenticationManager($this->authMng);
-            $this->router->addInternalClient($this->authMng);
-
-            $this->auth = new $authClass(ArrayHelper::getValue($authOptions, 'realms', ["*"]));
-            $this->router->addInternalClient($this->auth);
-        }
 
         $this->provider = new $providerClass(
             ArrayHelper::getValue($providerOptions, 'address', 'localhost'),

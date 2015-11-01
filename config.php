@@ -12,9 +12,6 @@ return [
             'address' => 'localhost',
             'port' => 8008,
         ],
-        'auth' => [
-            'class' => '\vitprog\wamp\server\AuthProvider',
-        ],
         'internal' => [
             'realm' => 'realm1',
             'controllers' => [],
