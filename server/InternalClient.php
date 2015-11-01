@@ -164,14 +164,14 @@ class InternalClient extends Client {
     public function onSessionJoin($args, $kwArgs, $options) {
 //        VarDumper::dump([$args, $kwArgs, $options]);
         try {
-            $roleCheck = isset($args[0]->authroles) && in_array('authenticated_user', $args[0]->authroles);
-            $userId = (int)$args[0]->authid;
+//            $roleCheck = isset($args[0]->authroles) && in_array('authenticated_user', $args[0]->authroles);
+//            $userId = (int)$args[0]->authid;
             $sessionId = (int)$args[0]->session;
-
-            if (!$roleCheck || !$userId || !$sessionId) {
-                var_dump('---------------------------------');
-                return;
-            }
+//
+//            if (!$roleCheck || !$userId || !$sessionId) {
+//                var_dump('---------------------------------');
+//                return;
+//            }
 
             echo "Session {$sessionId} joinned\n";
 
