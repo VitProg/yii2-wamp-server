@@ -171,13 +171,9 @@ abstract class WampController extends Component {
 
             if (strpos($name, '_call_') === 0) {
 
-                // добавлять токен
                 $methodName = substr($name, strlen('_call_'));
 
-                list ($args, $argsKw, $details) = $params;
-
-                /** @var InternalClient $internal */
-                $internal = Yii::$app->wampInternal;
+                list ($args, $argsKw) = $params;
 
                 if (is_object($argsKw)) {
                     $argsKw = (array)$argsKw;
@@ -194,7 +190,17 @@ abstract class WampController extends Component {
 
                 if ($session == null) {
                     // todo disconect client
-                    return null;
+                    return ['error' => 'session is null'];
+                }
+
+                $user = $session->getUser();
+
+                if ($user == null) {
+                    return ['error' => 'user is null'];
+                }
+
+                if ($user->wampGenerateToken() != $token) {
+                    return ['error' => 'token!'];
                 }
 
                 unset($args['token']);
@@ -230,7 +236,6 @@ abstract class WampController extends Component {
                             $argsMethod[] = $param->getDefaultValue();
                         } else {
                             if ($name == 'currentUser' || $name == 'user') {
-                                $user = $session->getUser();
                                 if ($user == null) {
                                     $missing[] = $name;
                                 } else {

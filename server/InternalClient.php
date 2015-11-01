@@ -148,13 +148,20 @@ class InternalClient extends Client {
 
         $token = $user->wampGenerateToken($authToken);
 
+        if ($token) {
+            $session = new Session($sessionId, $token, $user->id);
+            $session->saveSession();
+        }
+
+        VarDumper::dump([$kwArgs, $token, $user->toArray()]);
+
         return [
             'token' => $token,
         ];
     }
 
     public function onSessionJoin($args, $kwArgs, $options) {
-        VarDumper::dump([$args, $kwArgs, $options]);
+//        VarDumper::dump([$args, $kwArgs, $options]);
         try {
             $roleCheck = isset($args[0]->authroles) && in_array('authenticated_user', $args[0]->authroles);
             $userId = (int)$args[0]->authid;
@@ -173,7 +180,7 @@ class InternalClient extends Client {
     }
 
     public function onSessionLeave($args, $kwArgs, $options) {
-        VarDumper::dump([$args, $kwArgs, $options]);
+//        VarDumper::dump([$args, $kwArgs, $options]);
         try {
             $sessionId = (int)$args[0]->session;
 //            $this->removeSessionFromList($sessionId);
