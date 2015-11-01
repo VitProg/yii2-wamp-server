@@ -176,11 +176,11 @@ abstract class WampController extends Component {
 
                 list ($args, $argsKw) = $params;
 
-                var_dump([$args, $argsKw]);
-
                 if (is_object($argsKw)) {
                     $argsKw = (array)$argsKw;
                 };
+
+                var_dump([$args, $argsKw]);
 
                 if (empty($argsKw) || empty($argsKw['token'])) {
                     // todo disconnect session
@@ -188,7 +188,7 @@ abstract class WampController extends Component {
                     return false;
                 }
 
-                $token = (int)$argsKw['token'];
+                $token = $argsKw['token'];
                 $session = Session::getSession($token);
 
                 if ($session == null) {
