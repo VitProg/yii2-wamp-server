@@ -27,8 +27,7 @@
     "php": ">=5.4.0",
     "yiisoft/yii2": "*",
     "voryx/thruway":"0.3.*",
-    "bower-asset/autobahn" : "*",
-    "bower-asset/cryptojslib" : "*"
+    "bower-asset/wampy.js" : "*"
   },
   "require-dev": {
     "phpunit/phpunit": "4.*"

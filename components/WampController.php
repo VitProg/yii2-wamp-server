@@ -203,6 +203,7 @@ abstract class WampController extends Component {
                         $params = array_merge($params, $argsKw);
                     }
                     $params['args'] = $args;
+                    // todo $currentUserId - фигня какаято
                     $params['userId'] = (int)$sessionData['user'];
                     $params['currentUserId'] = (int)$sessionData['user'];
 

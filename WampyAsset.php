@@ -12,12 +12,12 @@ namespace vitprog\wamp;
 
 use yii\web\AssetBundle;
 
-class AutobahnAsset extends AssetBundle {
+class WampyAsset extends AssetBundle {
 
-    public $sourcePath = '@bower/autobahn';
+    public $sourcePath = '@bower/wampy.js';
 
     public $js = [
-        'autobahn.js',
+        'src/wampy.js',
     ];
 
 }

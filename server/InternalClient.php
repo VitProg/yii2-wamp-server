@@ -35,11 +35,7 @@ class InternalClient extends Client {
     public $controllers = [];
     public $sessionDuration = 86400; // 1 day
 
-    /**
-     * List sessions info
-     * @var array
-     */
-    protected $_sessions = [];
+    public $session;
 
     protected $_controllers = [];
 
@@ -59,6 +55,9 @@ class InternalClient extends Client {
         echo "--------------- Hello from InternalClient ------------" . PHP_EOL;
         try {
 
+            $this->session = $session;
+
+            $session->register('app.auth', [$this, 'onAuth']);
             $session->subscribe('wamp.metaevent.session.on_join',  [$this, 'onSessionJoin']);
             $session->subscribe('wamp.metaevent.session.on_leave', [$this, 'onSessionLeave']);
 
@@ -125,8 +124,13 @@ class InternalClient extends Client {
         }
     }
 
-    public function onSessionJoin($args, $kwArgs, $options) {
+    public function onAuth($args, $kwArgs, $options) {
+        VarDumper::dump([$args, $kwArgs, $options]);
+        //todo
+    }
 
+    public function onSessionJoin($args, $kwArgs, $options) {
+        VarDumper::dump([$args, $kwArgs, $options]);
         try {
             $roleCheck = isset($args[0]->authroles) && in_array('authenticated_user', $args[0]->authroles);
             $userId = (int)$args[0]->authid;
@@ -137,8 +141,6 @@ class InternalClient extends Client {
                 return;
             }
 
-            $this->addSessionToList($sessionId, $userId);
-
             echo "Session {$sessionId} joinned\n";
 
         } catch (\Exception $e) {
@@ -147,69 +149,16 @@ class InternalClient extends Client {
     }
 
     public function onSessionLeave($args, $kwArgs, $options) {
+        VarDumper::dump([$args, $kwArgs, $options]);
         try {
             $sessionId = (int)$args[0]->session;
-            $this->removeSessionFromList($sessionId);
+//            $this->removeSessionFromList($sessionId);
 
             echo "Session {$sessionId} leaved\n";
 
         } catch (\Exception $e) {
             echo Console::renderColoredString('%rError: %w' . (string)$e . '%n') . PHP_EOL;
         }
-    }
-
-
-    /// clients sessions
-
-    public function getSessionList() {
-        /** @var Cache $cache */
-        $cache = \Yii::$app->wampCache;
-        $sessions = $cache->get('wamp_sessions');
-        if (!$sessions) {
-            $sessions = [];
-            $cache->set('wamp_sessions', $sessions, 0);
-        }
-        return $sessions;
-    }
-
-    public function setSessionList($sessions) {
-        /** @var Cache $cache */
-        $cache = \Yii::$app->wampCache;
-        $cache->set('wamp_sessions', $sessions, 0);
-    }
-
-    public function addSessionToList($sessionId, $user) {
-        /** @var Cache $cache */
-        $cache = \Yii::$app->wampCache;
-
-        $time = time();
-
-        $sessionData = [
-            'session' => $sessionId,
-            'user' => $user,
-            'time' => $time,
-        ];
-        $cache->set('wamp_session_' . $sessionId, $sessionData, $this->sessionDuration);
-        $sessions = $this->getSessionList();
-        $sessions[$sessionId] = $time;
-        $this->setSessionList($sessions);
-    }
-
-    public function getSessionInList($sessionId) {
-        /** @var Cache $cache */
-        $cache = \Yii::$app->wampCache;
-        $sessionDate = $cache->get('wamp_session_' . (int)$sessionId);
-        return $sessionDate ? $sessionDate : null;
-    }
-
-    public function removeSessionFromList($sessionId) {
-        /** @var Cache $cache */
-        $cache = \Yii::$app->wampCache;
-        $cache->delete('wamp_session_' . (int)$sessionId);
-
-        $sessions = $this->getSessionList();
-        unset($sessions[$sessionId]);
-        $this->setSessionList($sessions);
     }
 
 }
