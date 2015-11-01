@@ -9,6 +9,7 @@
 namespace vitprog\wamp\components;
 
 
+use React\Promise\Promise;
 use vitprog\wamp\server\Session;
 use \Yii;
 use vitprog\wamp\server\InternalClient;

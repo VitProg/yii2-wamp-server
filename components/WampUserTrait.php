@@ -8,8 +8,12 @@ trait WampUserTrait {
 
     public $wampSession;
 
+    public function wampGetAuthToken() {
+        return sha1($this->getAuthKey());
+    }
+
     public function wampGenerateToken($authToken = null) {
-        $token = sha1(md5(($authToken ? $authToken : $this->getAuthKey()) . $this->id . self::$wampSecret));
+        $token = sha1(md5(($authToken ? $authToken : $this->wampGetAuthToken()) . $this->id . self::$wampSecret));
         return $token;
     }
 
