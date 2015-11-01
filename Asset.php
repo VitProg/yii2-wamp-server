@@ -24,7 +24,6 @@ class Asset extends AssetBundle {
     public $depends = [
         'yii\web\JqueryAsset',
         'vitprog\wamp\WampyAsset',
-        'vitprog\wamp\CryptoAsset',
     ];
 
     public static $jsSettings = [];
