@@ -143,7 +143,7 @@ class InternalClient extends Client {
         }
 
         if ($user->wampGetAuthToken() != $authToken) {
-            VarDumper::dump([$user->wampGetAuthToken() != $authToken]);
+            VarDumper::dump([$user->wampGetAuthToken(), $authToken]);
             return 'authToken';
         }
 
