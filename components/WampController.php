@@ -266,6 +266,7 @@ abstract class WampController extends Component {
             }
             throw new UnknownMethodException('Calling unknown method: ' . get_class($this) . "::$name()");
         } catch (\Exception $ex) {
+            echo PHP_EOL . $ex->getFile() . ':' . $ex->getLine() . ' - ' . $ex->getMessage() . PHP_EOL;
             \Yii::getLogger()->log($ex, Logger::LEVEL_ERROR, 'wamp-server');
         }
         return null;
