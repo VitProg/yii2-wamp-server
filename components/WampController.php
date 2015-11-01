@@ -174,22 +174,24 @@ abstract class WampController extends Component {
 
                 $methodName = substr($name, strlen('_call_'));
 
-                list ($args, $argsKw) = $params;
+                list ($args, $argsuments) = $params;
 
-                if (is_object($argsKw)) {
-                    $argsKw = (array)$argsKw;
+                if (is_object($argsuments)) {
+                    $argsuments = (array)$argsuments;
                 };
 
-                var_dump([$args, $argsKw]);
+                var_dump($argsuments);
 
-                if (empty($argsKw) || empty($argsKw['token'])) {
+                if (empty($argsuments) || empty($argsuments['token'])) {
                     // todo disconnect session
-                    var_dump('!!!!!!!!!!!!!!!!!!!!!!!!');
-                    return false;
+                    return ['error' => 'token is null'];
                 }
 
-                $token = $argsKw['token'];
+                $token = $argsuments['token'];
                 $session = Session::getSession($token);
+
+                var_dump($token);
+                var_dump($session);
 
                 if ($session == null) {
                     // todo disconect client
@@ -197,6 +199,7 @@ abstract class WampController extends Component {
                 }
 
                 $user = $session->getUser();
+                var_dump($user->toArray());
 
                 if ($user == null) {
                     return ['error' => 'user is null'];
@@ -209,21 +212,21 @@ abstract class WampController extends Component {
                 unset($args['token']);
 
                 if ($this->hasMethod($methodName)) {
+                    var_dump('line:'.__LINE__);
                     $params = ['session' => $session];
-                    if (!empty($argsKw)/* && ArrayHelper::isAssociative($argsKw)*/) {
-                        $params = array_merge($params, $argsKw);
+                    if (!empty($argsuments)) {
+                        $params = array_merge($params, $argsuments);
                     }
                     $params['args'] = $args;
-                    // todo $currentUserId - фигня какаято
                     $params['userId'] = (int)$session->userId;
                     $params['currentUserId'] = (int)$session->userId;
 
                     $method = new \ReflectionMethod($this, $methodName);
-
+                    var_dump('line:'.__LINE__);
                     $argsMethod = [];
                     $missing = [];
                     foreach ($method->getParameters() as $param) {
-
+                        var_dump('line:'.__LINE__);
                         $name = $param->getName();
                         $name = str_replace(' ', '', ucwords(implode(' ', explode('-', $name))));
                         $name = mb_strtolower(substr($name, 0, 1)) . substr($name, 1);
@@ -249,11 +252,15 @@ abstract class WampController extends Component {
                             }
                         }
                     }
-
+                    var_dump('line:'.__LINE__);
                     if (Yii::$app->requestedParams === null) {
                         Yii::$app->requestedParams = $params;
                     }
-
+                    var_dump([
+                        '$methodName' => $methodName,
+                        '$argsMethod' => $argsMethod,
+                        'Yii::$app->requestedParams' => Yii::$app->requestedParams
+                    ]);
                     return call_user_func_array([$this, $methodName], $argsMethod);
                 }
             }
