@@ -103,7 +103,7 @@ wamp = new (function($){
     };
 
     this.unregister = function (topic, onSuccess, onError) {
-        return self.ws.register(topic, {'rpc' : rpc, 'onSuccess' : onSuccess, 'onError' : onError}, advancedOptions);
+        return self.ws.register(topic, {'onSuccess' : onSuccess, 'onError' : onError}, advancedOptions);
     };
 
     this.call = function(topic, data, onSuccess, onError, advancedOptions) {
@@ -115,6 +115,10 @@ wamp = new (function($){
         }
         return self.ws.call(topic, data, {'onSuccess' : onSuccess, 'onError' : onError}, advancedOptions);
     };
+
+    this.getUserId = function() {
+        return settings.uid;
+    }
 
     var events = {};
     this.bind = function(event, callback) {
