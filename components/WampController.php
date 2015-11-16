@@ -271,9 +271,15 @@ abstract class WampController extends Component {
                                 Yii::$app->requestedParams = &$params;
                             }
 
+                            /** @var WampResult $result */
                             $result = call_user_func_array([$this, $methodName], $argsMethod);
                             $this->afterCall($methodName, $params, $result);
-                            return $result;
+
+                            if ($result instanceof WampResult == false) {
+                                return WampResult::failure(new WampException('Result not instance of WampResult class', 500, isset($methodName) ? $methodName : $name));
+                            } else {
+                                return $result;
+                            }
                         }
                     } catch (WampException $ex) {
                         return WampResult::failure($ex);
