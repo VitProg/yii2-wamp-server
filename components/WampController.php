@@ -166,6 +166,13 @@ abstract class WampController extends Component {
     public function init() {
     }
 
+    public function beforeCall($callName, &$params) {
+        return true;
+    }
+
+    public function afterCall($callName, $params, &$callResult) {
+    }
+
     public function __call($name, $params)
     {
         try {
@@ -227,45 +234,54 @@ abstract class WampController extends Component {
                     $params['userId'] = (int)$session->userId;
                     $params['currentUserId'] = (int)$session->userId;
 
-                    $method = new \ReflectionMethod($this, $methodName);
-//                    var_dump('line:'.__LINE__);
-                    $argsMethod = [];
-                    $missing = [];
-                    foreach ($method->getParameters() as $param) {
-//                        var_dump('line:'.__LINE__);
-                        $name = $param->getName();
+                    try {
+                        if ($this->beforeCall($methodName, $params) !== false) {
 
-                        if (array_key_exists($name, $params)) {
-                            if ($param->isArray()) {
-                                $argsMethod[] = is_array($params[$name]) ? $params[$name] : [$params[$name]];
-                            } else {
-                                $argsMethod[] = $params[$name];
-                            }
-                            unset($params[$name]);
-                        } elseif ($param->isDefaultValueAvailable()) {
-                            $argsMethod[] = $param->getDefaultValue();
-                        } else {
-                            if ($name == 'currentUser' || $name == 'user') {
-                                if ($user == null) {
-                                    $missing[] = $name;
+                            $method = new \ReflectionMethod($this, $methodName);
+                            //                    var_dump('line:'.__LINE__);
+                            $argsMethod = [];
+                            $missing = [];
+                            foreach ($method->getParameters() as $param) {
+                                //                        var_dump('line:'.__LINE__);
+                                $name = $param->getName();
+
+                                if (array_key_exists($name, $params)) {
+                                    if ($param->isArray()) {
+                                        $argsMethod[] = is_array($params[$name]) ? $params[$name] : [$params[$name]];
+                                    } else {
+                                        $argsMethod[] = $params[$name];
+                                    }
+                                    unset($params[$name]);
+                                } elseif ($param->isDefaultValueAvailable()) {
+                                    $argsMethod[] = $param->getDefaultValue();
                                 } else {
-                                    $argsMethod[] = $user;
+                                    if ($name == 'currentUser' || $name == 'user') {
+                                        if ($user == null) {
+                                            $missing[] = $name;
+                                        } else {
+                                            $argsMethod[] = $user;
+                                        }
+                                    } else {
+                                        $missing[] = $name;
+                                    }
                                 }
-                            } else {
-                                $missing[] = $name;
                             }
+
+                            if (Yii::$app->requestedParams === null) {
+                                Yii::$app->requestedParams = &$params;
+                            }
+
+                            $result = call_user_func_array([$this, $methodName], $argsMethod);
+                            $this->afterCall($methodName, $params, $result);
+                            return $result;
                         }
+                    } catch (WampException $ex) {
+                        return $ex->toArray();
+                    } catch (\Exception $ex) {
+                        //todo
+                        return (new WampException($ex->getMessage(), $ex->getCode(), isset($methodName) ? $methodName : $name, $ex))->toArray();
                     }
-//                    var_dump('line:'.__LINE__);
-                    if (Yii::$app->requestedParams === null) {
-                        Yii::$app->requestedParams = $params;
-                    }
-//                    var_dump([
-//                        '$methodName' => $methodName,
-//                        '$argsMethod' => $argsMethod,
-//                        'Yii::$app->requestedParams' => Yii::$app->requestedParams
-//                    ]);
-                    return call_user_func_array([$this, $methodName], $argsMethod);
+                    return null;
                 }
             }
 
