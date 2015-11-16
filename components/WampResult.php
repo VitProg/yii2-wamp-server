@@ -22,6 +22,10 @@ class WampResult {
 
     protected function __construct() {}
 
+    /**
+     * @param array $data
+     * @return static
+     */
     public static function success(array $data = []) {
         $self = new static();
         $self->result = static::RESULT_OK;
@@ -29,26 +33,42 @@ class WampResult {
         return $self;
     }
 
+    /**
+     * @param null $msg
+     * @param array $data
+     * @return array
+     */
     public static function failure($msg = null, array $data = []) {
+        $self = new static();
+        $self->result = static::RESULT_ERROR;
+
         if ($msg && $msg instanceof WampException) {
-            return $msg->toArray();
+            $self->msg = $msg->getMessage();
+            $self->data = $msg->toArray();
         } else {
-            return [
-                'result' => 'error',
-                'msg' => $msg,
-                'data' => $data,
-            ];
+            $self->msg = $msg;
+            $self->data = $data;
         }
+        return $self;
     }
 
+    /**
+     * @return bool
+     */
     public function isOk() {
         return $this->result == static::RESULT_OK;
     }
 
+    /**
+     * @return bool
+     */
     public function isError() {
         return !$this->isOk();
     }
 
+    /**
+     * @return array
+     */
     public function toArray() {
         if ($this->isOk()) {
             return [

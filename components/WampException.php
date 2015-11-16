@@ -32,6 +32,7 @@ class WampException extends \Exception {
         $data = [
             'result' => 'error',
             'code' => $this->code,
+            'msg' => $this->getMessage(),
         ];
         if (defined('WAMP_DEBUG') && WAMP_DEBUG == true) {
             $data['file'] = $this->file;
