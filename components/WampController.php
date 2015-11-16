@@ -276,10 +276,10 @@ abstract class WampController extends Component {
                             return $result;
                         }
                     } catch (WampException $ex) {
-                        return $ex->toArray();
+                        return WampResult::failure($ex);
                     } catch (\Exception $ex) {
                         //todo
-                        return (new WampException($ex->getMessage(), $ex->getCode(), isset($methodName) ? $methodName : $name, $ex))->toArray();
+                        return WampResult::failure(new WampException($ex->getMessage(), $ex->getCode(), isset($methodName) ? $methodName : $name, $ex));
                     }
                     return null;
                 }
