@@ -22,7 +22,7 @@ class WampException extends \Exception {
      * @param string $method
      * @param Exception $previous
      */
-    public function __construct($message, $code, $method, Exception $previous) {
+    public function __construct($message = null, $code = null, $method = null, Exception $previous = null) {
         parent::__construct($message, $code, $previous);
         $this->method = $method;
     }
